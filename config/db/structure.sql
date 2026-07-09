@@ -733,7 +733,8 @@ CREATE TABLE public.playlist_item (
     stop_at timestamp without time zone,
     hidden_at timestamp without time zone,
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    windows jsonb DEFAULT '[{"end": "00:00", "days": ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"], "start": "00:00"}]'::jsonb NOT NULL
 );
 
 
@@ -1808,4 +1809,5 @@ INSERT INTO schema_migrations (filename) VALUES
 ('20260610103052_remove_device_api_key_and_friendly_id_columns.rb'),
 ('20260615094348_create_screen_template.rb'),
 ('20260618094125_add_screen_template_id_column.rb'),
-('20260630091508_add_device_log_level_column.rb');
+('20260630091508_add_device_log_level_column.rb'),
+('20260709101500_add_playlist_item_windows_column.rb');

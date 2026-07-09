@@ -20,6 +20,12 @@
       width: 6rem;
       height: 1.5rem;
     }
+
+    .playlist-switch {
+      align-items: center;
+      display: flex;
+      gap: 0.5rem;
+    }
   }
 
   .log {

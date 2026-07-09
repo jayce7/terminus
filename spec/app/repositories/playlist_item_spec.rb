@@ -108,8 +108,11 @@ RSpec.describe Terminus::Repositories::PlaylistItem, :db do
   end
 
   describe "#next_item" do
+    let(:playlist_id) { Factory[:playlist].id }
+    let(:noon) { Time.new 2025, 1, 1, 12, 0 }
+    let(:window) { {"days" => %w[wednesday], "start" => "08:00", "end" => "18:00"} }
+
     it "answers next item" do
-      playlist_id = Factory[:playlist].id
       one = Factory[:playlist_item, playlist_id:, position: 1]
       two = Factory[:playlist_item, playlist_id:, position: 2]
 
@@ -117,6 +120,58 @@ RSpec.describe Terminus::Repositories::PlaylistItem, :db do
         position: two.position,
         screen: kind_of(Terminus::Structs::Screen)
       )
+    end
+
+    it "answers first item when after last position" do
+      one = Factory[:playlist_item, playlist_id:, position: 1]
+      Factory[:playlist_item, playlist_id:, position: 2]
+
+      expect(repository.next_item(after: 2, playlist_id:)).to have_attributes(
+        position: one.position
+      )
+    end
+
+    it "answers same item when playlist has only one item" do
+      item = Factory[:playlist_item, playlist_id:, position: 1]
+
+      expect(repository.next_item(after: item.position, playlist_id:)).to have_attributes(
+        position: item.position
+      )
+    end
+
+    it "answers next item with gaps after" do
+      Factory[:playlist_item, playlist_id:, position: 3]
+      expect(repository.next_item(after: 1, playlist_id:)).to have_attributes(position: 3)
+    end
+
+    it "answers next item with gaps before" do
+      Factory[:playlist_item, playlist_id:, position: 1]
+      expect(repository.next_item(after: 3, playlist_id:)).to have_attributes(position: 1)
+    end
+
+    it "skips item outside display window" do
+      one = Factory[:playlist_item, playlist_id:, position: 1, windows: [window]]
+      Factory[:playlist_item, playlist_id:, position: 2, windows: []]
+      three = Factory[:playlist_item, playlist_id:, position: 3, windows: [window]]
+
+      expect(repository.next_item(after: one.position, playlist_id:, at: noon)).to have_attributes(
+        position: three.position
+      )
+    end
+
+    it "wraps to first item within display window" do
+      one = Factory[:playlist_item, playlist_id:, position: 1, windows: [window]]
+      two = Factory[:playlist_item, playlist_id:, position: 2, windows: [window]]
+      Factory[:playlist_item, playlist_id:, position: 3, windows: []]
+
+      expect(repository.next_item(after: two.position, playlist_id:, at: noon)).to have_attributes(
+        position: one.position
+      )
+    end
+
+    it "answers nil when no item is within display window" do
+      Factory[:playlist_item, playlist_id:, position: 1, windows: []]
+      expect(repository.next_item(after: 1, playlist_id:, at: noon)).to be(nil)
     end
   end
 

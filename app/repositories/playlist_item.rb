@@ -31,7 +31,11 @@ module Terminus
 
       def find_by(**) = with_associations.where(**).one
 
-      def next_item(playlist_id:, after:) = playlist_item.next_item(playlist_id:, after:)
+      def next_item playlist_id:, after:, at: Time.now
+        items = where(playlist_id:).select { it.scheduled? at }
+
+        items.find { it.position > after } || items.first
+      end
 
       def where(**)
         with_associations.where(**)

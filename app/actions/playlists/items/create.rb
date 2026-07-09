@@ -12,10 +12,7 @@ module Terminus
             show_view: "views.playlists.items.show"
           ]
 
-          params do
-            required(:playlist_id).filled :integer
-            required(:playlist_item).hash { required(:screen_id).filled :integer }
-          end
+          contract Contracts::PlaylistItems::Create
 
           def handle request, response
             parameters = request.params

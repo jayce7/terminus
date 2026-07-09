@@ -5,7 +5,7 @@ module Terminus
   module Serializers
     # A playlist item serializer for specific keys.
     class PlaylistItem
-      KEYS = %i[id screen_id position created_at updated_at].freeze
+      KEYS = %i[id screen_id position windows created_at updated_at].freeze
 
       def initialize record, keys: KEYS, transformer: Transformers::Time
         @record = record

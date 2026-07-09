@@ -63,6 +63,32 @@ RSpec.describe Terminus::Aspects::Screens::Rotator, :db do
       expect(rotator.call(device).success).to have_attributes(label: /Welcome/)
     end
 
+    it "skips screen outside display window" do
+      Factory[
+        :playlist_item,
+        playlist_id: device.playlist_id,
+        screen_id: Factory[:screen, label: "Hidden"].id,
+        position: 2,
+        windows: []
+      ]
+
+      Factory[
+        :playlist_item,
+        playlist_id: device.playlist_id,
+        screen_id: Factory[:screen, label: "Test"].id,
+        position: 3
+      ]
+
+      expect(rotator.call(device).success).to have_attributes(label: "Test")
+    end
+
+    it "answers current screen when no item is within display window" do
+      playlist = playlist_repository.find device.playlist_id
+      item_repository.update playlist.current_item_id, windows: []
+
+      expect(rotator.call(device).success).to have_attributes(label: /Welcome/)
+    end
+
     it "answers failure when playlist can't be found" do
       expect(rotator.call(Factory[:device])).to be_failure(
         "Unable to obtain next screen. Can't find playlist with ID: nil."

@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "date"
 require "dry/types"
 require "stringio"
 require "tempfile"
@@ -8,6 +9,10 @@ module Terminus
   # The custom types.
   module Types
     include Dry.Types(default: :strict)
+
+    ClockTime = String.constrained(format: /\A([01]\d|2[0-3]):[0-5]\d\Z/)
+
+    Day = String.enum(*::Date::DAYNAMES.map(&:downcase))
 
     File = Instance(IO) | Instance(Tempfile) | Instance(StringIO)
 

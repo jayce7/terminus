@@ -3,6 +3,65 @@
 require "hanami_helper"
 
 RSpec.describe Terminus::Types do
+  describe "ClockTime" do
+    subject(:type) { described_class::ClockTime }
+
+    it "answers primitive" do
+      expect(type.primitive).to eq(String)
+    end
+
+    it "answers valid midnight" do
+      expect(type.call("00:00")).to eq("00:00")
+    end
+
+    it "answers valid last minute of day" do
+      expect(type.call("23:59")).to eq("23:59")
+    end
+
+    it "fails without leading zero" do
+      expectation = proc { type.call "8:00" }
+      expect(&expectation).to raise_error(Dry::Types::ConstraintError, /violates constraints/)
+    end
+
+    it "fails with invalid hour" do
+      expectation = proc { type.call "24:00" }
+      expect(&expectation).to raise_error(Dry::Types::ConstraintError, /violates constraints/)
+    end
+
+    it "fails with invalid minute" do
+      expectation = proc { type.call "08:60" }
+      expect(&expectation).to raise_error(Dry::Types::ConstraintError, /violates constraints/)
+    end
+
+    it "fails with seconds" do
+      expectation = proc { type.call "08:00:00" }
+      expect(&expectation).to raise_error(Dry::Types::ConstraintError, /violates constraints/)
+    end
+  end
+
+  describe "Day" do
+    subject(:type) { described_class::Day }
+
+    it "answers primitive" do
+      expect(type.primitive).to eq(String)
+    end
+
+    it "answers valid days" do
+      days = %w[sunday monday tuesday wednesday thursday friday saturday]
+      expect(days.map { type.call it }).to eq(days)
+    end
+
+    it "fails when capitalized" do
+      expectation = proc { type.call "Monday" }
+      expect(&expectation).to raise_error(Dry::Types::ConstraintError, /violates constraints/)
+    end
+
+    it "fails when abbreviated" do
+      expectation = proc { type.call "mon" }
+      expect(&expectation).to raise_error(Dry::Types::ConstraintError, /violates constraints/)
+    end
+  end
+
   describe "File" do
     subject(:type) { described_class::File }
 

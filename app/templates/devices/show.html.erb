@@ -40,7 +40,22 @@
           <%= render "shared/popovers/triggers/default", name: :playlist %>
         </dt>
         <dd class="value">
-          <%= device.playlist ? link_to(device.playlist.label, routes.path(:playlist, id: device.playlist_id)) : nil %>
+          <%= form_for :device,
+                       routes.path(:device, id: device.id),
+                       method: :put,
+                       values: {device: {model_id: device.model_id, playlist_id: device.playlist_id}},
+                       class: "playlist-switch",
+                       **HTMX[
+                         put: routes.path(:device, id: device.id),
+                         trigger: :change,
+                         target: "closest .bit-page"
+                       ] do |form| %>
+            <%= tag.input name: :_csrf_token, type: :hidden, value: csrf_token %>
+            <%= form.hidden_field :model_id %>
+            <%= form.select :playlist_id, select_options_for(playlists), id: :device_playlist_id, class: :value %>
+
+            <%= device.playlist ? link_to("Show", routes.path(:playlist, id: device.playlist_id), class: :link) : nil %>
+          <% end %>
         </dd>
 
         <dt class="key">

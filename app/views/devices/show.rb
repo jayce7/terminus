@@ -6,6 +6,7 @@ module Terminus
       # The show view.
       class Show < View
         decorate :device
+        expose :playlists
       end
     end
   end
