@@ -29,6 +29,9 @@ RSpec.describe Terminus::Serializers::Playlist, :db do
             id: item.id,
             screen_id: kind_of(Integer),
             position: kind_of(Integer),
+            windows: [
+              hash_including("start" => "00:00", "end" => "00:00", "days" => kind_of(Array))
+            ],
             created_at: match_rfc_3339,
             updated_at: match_rfc_3339
           )

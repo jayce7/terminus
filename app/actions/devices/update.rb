@@ -33,7 +33,10 @@ module Terminus
           id = device.id
           repository.update id, **parameters[:device]
 
-          response.render show_view, device: repository.find(id), layout: false
+          response.render show_view,
+                          device: repository.find(id),
+                          playlists: playlist_repository.all,
+                          layout: false
         end
 
         def error device, parameters, response

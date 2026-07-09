@@ -1,0 +1,19 @@
+<div class="windows-strip">
+  <div class="row">
+    <span class="cell label"></span>
+
+    <% 24.times do |hour| %>
+      <span class="cell label"><%= hour if (hour % 6).zero? %></span>
+    <% end %>
+  </div>
+
+  <% item.coverage.each do |label, cells| %>
+    <div class="row">
+      <span class="cell label"><%= label %></span>
+
+      <% cells.each do |on| %>
+        <span class="<%= on ? "cell on" : "cell" %>"></span>
+      <% end %>
+    </div>
+  <% end %>
+</div>

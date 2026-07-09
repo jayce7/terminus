@@ -22,7 +22,10 @@ module Terminus
               required(:name).filled :string
               required(:label).filled :string
               optional(:mode).filled :string
-              optional(:items).maybe(:array).each(:hash) { required(:screen_id).filled :integer }
+              optional(:items).maybe(:array).each(:hash) do
+                required(:screen_id).filled :integer
+                optional(:windows).array Schemas::PlaylistItems::Window
+              end
             end
           end
 

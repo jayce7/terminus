@@ -5,7 +5,11 @@ module Terminus
     module Devices
       # The show action.
       class Show < Action
-        include Deps[:htmx_layout, repository: "repositories.device"]
+        include Deps[
+          :htmx_layout,
+          repository: "repositories.device",
+          playlist_repository: "repositories.playlist"
+        ]
 
         params { required(:id).filled :integer }
 
@@ -16,6 +20,7 @@ module Terminus
 
           response.render view,
                           device: repository.find(parameters[:id]),
+                          playlists: playlist_repository.all,
                           layout: htmx_layout.call(request)
         end
       end

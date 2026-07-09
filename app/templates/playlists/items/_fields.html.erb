@@ -1,7 +1,72 @@
+<% windows = field_for :windows, fields, item %>
+<% windows = windows.to_json unless windows.is_a? ::String %>
+
 <fieldset class="column">
   <%= scope(:form_field, key: :screen_id, errors:).render do %>
     <label class="key" for="playlist_item_screen_id">Screen</label>
 
     <%= form.select :screen_id, screen_options, id: :playlist_item_screen_id, class: :value %>
+  <% end %>
+
+  <%= scope(:form_field, key: :windows, errors:).render do %>
+    <label class="key" for="playlist_item_windows">Display Windows</label>
+
+    <div class="windows" x-data="windowEditor">
+      <input type="hidden"
+             name="playlist_item[windows]"
+             id="playlist_item_windows"
+             value="<%= windows %>"
+             x-ref="field">
+
+      <div class="windows-strip">
+        <div class="row">
+          <span class="cell label"></span>
+
+          <template x-for="hour in 24">
+            <span class="cell label" x-text="(hour - 1) % 6 == 0 ? hour - 1 : ''"></span>
+          </template>
+        </div>
+
+        <template x-for="day in days" :key="day">
+          <div class="row">
+            <span class="cell label" x-text="day[0].toUpperCase()"></span>
+
+            <template x-for="hour in 24">
+              <span class="cell" :class="{on: covered(day, hour - 1)}"></span>
+            </template>
+          </div>
+        </template>
+      </div>
+
+      <template x-for="(slot, index) in windows" :key="index">
+        <div class="window">
+          <span class="days">
+            <template x-for="day in days" :key="day">
+              <button type="button"
+                      :class="{on: slot.days.includes(day)}"
+                      :title="day"
+                      @click="toggle(slot, day)"
+                      x-text="day[0].toUpperCase()"></button>
+            </template>
+          </span>
+
+          <input type="time" x-model="slot.start" @input="sync" @change="sync">
+          <span class="separator">to</span>
+          <input type="time" x-model="slot.end" @input="sync" @change="sync">
+
+          <button type="button" class="bit-button" @click="remove(index)">Remove</button>
+        </div>
+      </template>
+
+      <p class="hint" x-show="!windows.length">
+        Never shown. Add a display window to show this item.
+      </p>
+
+      <div class="window-actions">
+        <button type="button" class="bit-button" @click="add">Add Window</button>
+        <button type="button" class="bit-button" @click="always">Always</button>
+        <button type="button" class="bit-button" @click="never">Never</button>
+      </div>
+    </div>
   <% end %>
 </fieldset>

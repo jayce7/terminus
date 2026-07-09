@@ -70,8 +70,8 @@ module Terminus
 
         collection.map.with_index 1 do |item, position|
           playlist_item.command(:create).call playlist_id: id,
-                                              screen_id: item[:screen_id],
-                                              position:
+                                              position:,
+                                              **item.slice(:screen_id, :windows)
         end
       end
     end

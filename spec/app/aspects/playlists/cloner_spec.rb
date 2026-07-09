@@ -33,6 +33,15 @@ RSpec.describe Terminus::Aspects::Playlists::Cloner, :db do
       )
     end
 
+    it "clones item display windows" do
+      windows = [{"days" => %w[monday], "start" => "08:00", "end" => "18:00"}]
+      Factory[:playlist_item, playlist_id: playlist.id, position: 9, windows:]
+
+      clone = cloner.call(playlist.id).bind { repository.with_items.by_pk(it.id).one }
+
+      expect(clone.playlist_items.map(&:windows)).to include(windows)
+    end
+
     it "clones current item" do
       clone = cloner.call(playlist.id).bind { repository.with_items.by_pk(it.id).one }
       expect(clone.current_item_id).to eq(item_two.id)

@@ -467,6 +467,8 @@ curl -X "PATCH" "https://localhost:2443/api/devices/1" \
 ----
 
 You can change a single attribute or multiple attributes at once. All attributes found in the POST request example are supported.
+
+💡 To switch a device to a different playlist -- treating each playlist as a preset -- patch the device with the new `playlist_id` only.
 ====
 
 .PATCH Response
@@ -1055,6 +1057,8 @@ You'll get an empty hash when there is nothing to delete.
 
 Provides playlist information. The following provides details on all requests and responses.
 
+Each item carries display windows which control when the item is shown as the playlist rotates. A window consists of days (lowercase day names), a start time (inclusive), and an end time (exclusive) in 24 hour (i.e. `HH:MM`) format evaluated using the server's local time. An end time at -- or before -- the start time wraps past midnight within the same day which means identical times (i.e. `00:00` to `00:00`) cover the entire day. An item without windows is never shown while new items default to a single all day, every day, window. When no item is within a display window, the device continues to show the current screen.
+
 .GET Request
 [%collapsible]
 ====
@@ -1093,6 +1097,13 @@ curl "https://localhost:2443/api/playlists/1" \
           "id": 39,
           "screen_id": 15,
           "position": 1,
+          "windows": [
+            {
+              "days": ["monday", "tuesday", "wednesday", "thursday", "friday"],
+              "start": "08:00",
+              "end": "18:00"
+            }
+          ],
           "created_at": "2026-03-05T00:14:56+00:00",
           "updated_at": "2026-03-05T00:14:56+00:00"
         },
@@ -1100,6 +1111,13 @@ curl "https://localhost:2443/api/playlists/1" \
           "id": 40,
           "screen_id": 16,
           "position": 2,
+          "windows": [
+            {
+              "days": ["monday", "tuesday", "wednesday", "thursday", "friday"],
+              "start": "08:00",
+              "end": "18:00"
+            }
+          ],
           "created_at": "2026-03-05T00:14:56+00:00",
           "updated_at": "2026-03-05T00:14:56+00:00"
         }
@@ -1123,6 +1141,13 @@ curl "https://localhost:2443/api/playlists/1" \
         "id": 39,
         "screen_id": 15,
         "position": 1,
+        "windows": [
+          {
+            "days": ["monday", "tuesday", "wednesday", "thursday", "friday"],
+            "start": "08:00",
+            "end": "18:00"
+          }
+        ],
         "created_at": "2026-03-05T00:14:56+00:00",
         "updated_at": "2026-03-05T00:14:56+00:00"
       },
@@ -1130,6 +1155,13 @@ curl "https://localhost:2443/api/playlists/1" \
         "id": 40,
         "screen_id": 16,
         "position": 2,
+        "windows": [
+          {
+            "days": ["monday", "tuesday", "wednesday", "thursday", "friday"],
+            "start": "08:00",
+            "end": "18:00"
+          }
+        ],
         "created_at": "2026-03-05T00:14:56+00:00",
         "updated_at": "2026-03-05T00:14:56+00:00"
       }
@@ -1155,7 +1187,14 @@ curl -X "POST" "https://localhost:2443/api/playlists" \
     "label": "Demo",
     "items": [
       {
-        "screen_id": "15"
+        "screen_id": "15",
+        "windows": [
+          {
+            "days": ["monday", "tuesday", "wednesday", "thursday", "friday"],
+            "start": "08:00",
+            "end": "18:00"
+          }
+        ]
       },
       {
         "screen_id": "16"
@@ -1185,6 +1224,13 @@ curl -X "POST" "https://localhost:2443/api/playlists" \
         "id": 39,
         "screen_id": 15,
         "position": 1,
+        "windows": [
+          {
+            "days": ["monday", "tuesday", "wednesday", "thursday", "friday"],
+            "start": "08:00",
+            "end": "18:00"
+          }
+        ],
         "created_at": "2026-03-05T00:14:56+00:00",
         "updated_at": "2026-03-05T00:14:56+00:00"
       },
@@ -1192,6 +1238,13 @@ curl -X "POST" "https://localhost:2443/api/playlists" \
         "id": 40,
         "screen_id": 16,
         "position": 2,
+        "windows": [
+          {
+            "days": ["monday", "tuesday", "wednesday", "thursday", "friday"],
+            "start": "08:00",
+            "end": "18:00"
+          }
+        ],
         "created_at": "2026-03-05T00:14:56+00:00",
         "updated_at": "2026-03-05T00:14:56+00:00"
       }
@@ -1226,7 +1279,7 @@ curl -X "PATCH" "https://localhost:2443/api/playlists/1" \
 }'
 ----
 
-You can change a single attribute or multiple attributes at once. Use an empty items array will delete all items in your playlist.
+You can change a single attribute or multiple attributes at once. Use an empty items array will delete all items in your playlist. Items may include display windows as shown in the POST request example.
 ====
 
 .PATCH Response
@@ -1248,6 +1301,13 @@ You can change a single attribute or multiple attributes at once. Use an empty i
         "id": 51,
         "screen_id": 16,
         "position": 1,
+        "windows": [
+          {
+            "days": ["monday", "tuesday", "wednesday", "thursday", "friday"],
+            "start": "08:00",
+            "end": "18:00"
+          }
+        ],
         "created_at": "2026-03-05T00:26:44+00:00",
         "updated_at": "2026-03-05T00:26:44+00:00"
       },
@@ -1255,6 +1315,13 @@ You can change a single attribute or multiple attributes at once. Use an empty i
         "id": 52,
         "screen_id": 15,
         "position": 2,
+        "windows": [
+          {
+            "days": ["monday", "tuesday", "wednesday", "thursday", "friday"],
+            "start": "08:00",
+            "end": "18:00"
+          }
+        ],
         "created_at": "2026-03-05T00:26:44+00:00",
         "updated_at": "2026-03-05T00:26:44+00:00"
       }
@@ -1295,6 +1362,13 @@ curl -X "DELETE" "https://localhost:2443/api/playlists/2" \
         "id": 51,
         "screen_id": 16,
         "position": 1,
+        "windows": [
+          {
+            "days": ["monday", "tuesday", "wednesday", "thursday", "friday"],
+            "start": "08:00",
+            "end": "18:00"
+          }
+        ],
         "created_at": "2026-03-05T00:26:44+00:00",
         "updated_at": "2026-03-05T00:26:44+00:00"
       },
@@ -1302,6 +1376,13 @@ curl -X "DELETE" "https://localhost:2443/api/playlists/2" \
         "id": 52,
         "screen_id": 15,
         "position": 2,
+        "windows": [
+          {
+            "days": ["monday", "tuesday", "wednesday", "thursday", "friday"],
+            "start": "08:00",
+            "end": "18:00"
+          }
+        ],
         "created_at": "2026-03-05T00:26:44+00:00",
         "updated_at": "2026-03-05T00:26:44+00:00"
       }

@@ -35,10 +35,15 @@ module Terminus
 
         # :reek:FeatureEnvy
         def advance_current_item playlist
-          return playlist.current_item if playlist.manual?
+          current = playlist.current_item
 
-          item_repository.next_item(after: playlist.current_item_position, playlist_id: playlist.id)
-                         .tap { |item| playlist_repository.update_current_item playlist, item }
+          return current if playlist.manual?
+
+          item = item_repository.next_item after: playlist.current_item_position,
+                                           playlist_id: playlist.id
+          playlist_repository.update_current_item playlist, item
+
+          item || current
         end
 
         def obtain_screen item

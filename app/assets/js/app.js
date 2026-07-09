@@ -34,6 +34,8 @@ import "../css/pages/problem_details.css";
 import Alpine from "alpinejs";
 import htmx from "htmx.org";
 
+import "./window_editor.js";
+
 window.Alpine = Alpine;
 window.htmx = htmx;
 

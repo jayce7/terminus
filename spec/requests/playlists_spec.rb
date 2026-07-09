@@ -15,6 +15,16 @@ RSpec.describe "/api/playlists", :db do
     }
   end
 
+  let :all_day do
+    [
+      {
+        days: %w[sunday monday tuesday wednesday thursday friday saturday],
+        start: "00:00",
+        end: "00:00"
+      }
+    ]
+  end
+
   it "answers playlists" do
     item
 
@@ -36,6 +46,7 @@ RSpec.describe "/api/playlists", :db do
               id: kind_of(Integer),
               screen_id: item.screen_id,
               position: kind_of(Integer),
+              windows: all_day,
               created_at: match_rfc_3339,
               updated_at: match_rfc_3339
             }
@@ -74,6 +85,7 @@ RSpec.describe "/api/playlists", :db do
             id: kind_of(Integer),
             screen_id: item.screen_id,
             position: kind_of(Integer),
+            windows: all_day,
             created_at: match_rfc_3339,
             updated_at: match_rfc_3339
           }
@@ -114,6 +126,7 @@ RSpec.describe "/api/playlists", :db do
             id: kind_of(Integer),
             screen_id: screen.id,
             position: kind_of(Integer),
+            windows: all_day,
             created_at: match_rfc_3339,
             updated_at: match_rfc_3339
           }
@@ -122,6 +135,34 @@ RSpec.describe "/api/playlists", :db do
         updated_at: match_rfc_3339
       }
     )
+  end
+
+  it "creates playlist with item display windows" do
+    screen = Factory[:screen]
+    windows = [{days: %w[monday friday], start: "08:00", end: "18:00"}]
+    attributes[:items] = [{screen_id: screen.id, windows:}]
+
+    post routes.path(:api_playlists),
+         {playlist: attributes}.to_json,
+         "HTTP_AUTHORIZATION" => access_token,
+         "CONTENT_TYPE" => "application/json"
+
+    expect(json_payload).to match(
+      data: hash_including(items: [hash_including(screen_id: screen.id, windows:)])
+    )
+  end
+
+  it "answers error when item display window is invalid" do
+    attributes[:items] = [
+      {screen_id: Factory[:screen].id, windows: [{days: %w[bogus], start: "08:00", end: "18:00"}]}
+    ]
+
+    post routes.path(:api_playlists),
+         {playlist: attributes}.to_json,
+         "HTTP_AUTHORIZATION" => access_token,
+         "CONTENT_TYPE" => "application/json"
+
+    expect(last_response.status).to eq(422)
   end
 
   it "creates playlist without items" do
@@ -190,6 +231,7 @@ RSpec.describe "/api/playlists", :db do
             id: kind_of(Integer),
             screen_id: screen.id,
             position: kind_of(Integer),
+            windows: all_day,
             created_at: match_rfc_3339,
             updated_at: match_rfc_3339
           }
@@ -220,6 +262,7 @@ RSpec.describe "/api/playlists", :db do
             id: kind_of(Integer),
             screen_id: item.screen_id,
             position: kind_of(Integer),
+            windows: all_day,
             created_at: match_rfc_3339,
             updated_at: match_rfc_3339
           }
@@ -269,6 +312,7 @@ RSpec.describe "/api/playlists", :db do
             id: kind_of(Integer),
             screen_id: item.screen_id,
             position: kind_of(Integer),
+            windows: all_day,
             created_at: match_rfc_3339,
             updated_at: match_rfc_3339
           }

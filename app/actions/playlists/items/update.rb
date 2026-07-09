@@ -11,20 +11,14 @@ module Terminus
             show_view: "views.playlists.items.show"
           ]
 
-          params do
-            required(:id).filled :integer
-            required(:playlist_id).filled :integer
-            required(:playlist_item).hash { required(:screen_id).filled :integer }
-          end
+          contract Contracts::PlaylistItems::Update
 
           def handle request, response
             parameters = request.params
 
-            if parameters.valid?
-              save parameters, response
-            else
-              error parameters, response
-            end
+            halt :unprocessable_content unless parameters.valid?
+
+            save parameters, response
           end
 
           private
@@ -35,14 +29,6 @@ module Terminus
             repository.update id, **parameters[:playlist_item]
 
             response.render show_view, item: repository.find(id), layout: false
-          end
-
-          def error parameters, response
-            response.render view,
-                            playlist:,
-                            fields: parameters[:playlist],
-                            errors: parameters.errors[:playlist],
-                            layout: false
           end
         end
       end

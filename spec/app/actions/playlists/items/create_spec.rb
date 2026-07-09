@@ -27,6 +27,22 @@ RSpec.describe Terminus::Actions::Playlists::Items::Create, :db do
       )
     end
 
+    it "creates item with display windows" do
+      params[:playlist_item][:windows] = %([{"days": ["monday"], "start": "08:00", "end": "18:00"}])
+      Rack::MockRequest.new(action).post("", params:)
+
+      item = Terminus::Repositories::PlaylistItem.new.find_by playlist_id: playlist.id
+
+      expect(item.windows).to eq([{"days" => ["monday"], "start" => "08:00", "end" => "18:00"}])
+    end
+
+    it "answers unprocessable entity with invalid windows" do
+      params[:playlist_item][:windows] = "bogus"
+      response = Rack::MockRequest.new(action).post("", params:)
+
+      expect(response.status).to eq(422)
+    end
+
     it "answers unprocessable entity with invalid parameters" do
       params.delete :playlist_item
       response = Rack::MockRequest.new(action).post("", params:)
